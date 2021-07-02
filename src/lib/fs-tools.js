@@ -4,6 +4,8 @@ import { dirname, join } from "path";
 
 const { readJSON, writeJSON } = fs;
 
+// JSON paths
+
 const mediaJSONPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../data/media.json"
