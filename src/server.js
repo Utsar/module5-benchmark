@@ -16,8 +16,20 @@ const port = process.env.PORT || 3001;
 
 const server = express();
 
+const whitelist = [process.env.FRONTEND_URL, process.env.FRONTEND_PROD_URL];
+
 // ********** MIDDLEWARES ********
-server.use(cors());
+server.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Access Denied!"));
+      }
+    },
+  })
+);
 server.use(express.json());
 
 // ********** ENDPOINTS ********
