@@ -1,11 +1,24 @@
 import express from "express";
 import fs from "fs-extra";
-import { dirname, join, extname } from "path";
-import { fileURLToPath } from "url";
+
 import uniqid from "uniqid";
 
 import { getMedia, writeMedia } from "../../lib/fs-tools.js";
 import { checkMediaSchema, checkValidatonResult } from "./validation.js";
+
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import multer from "multer";
+// import { generatePDFReadableStream } from "../../lib/pdf/index.js";
+
+const mediaPosterStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "Poster",
+  },
+});
+
+const uploadOnCloudinary = multer({ storage: mediaPosterStorage });
 
 const mediaRouter = express.Router();
 
@@ -85,5 +98,40 @@ mediaRouter.delete("/:id", async (req, res, next) => {
     next(error);
   }
 });
+
+// POST - Media - posterupload
+
+mediaRouter.post(
+  "/:imdbID/posterUpload",
+  uploadOnCloudinary.single("poster"),
+  async (req, res, next) => {
+    try {
+      const mediaContent = await getMedia();
+      const media = mediaContent.find((m) => m.imdbID === req.params.imdbID);
+      if (media) {
+        const remainingMedia = mediaContent.filter(
+          (m) => m.imdbID !== req.params.imdbID
+        );
+        const modifiedMedia = {
+          imdbID: req.params.imdbID,
+          ...media,
+          Poster: req.file.path,
+        };
+        remainingMedia.push(modifiedMedia);
+        await writeMedia(remainingMedia);
+        res.send(modifiedMedia);
+      } else {
+        next(
+          createError(
+            404,
+            `Cannot find media with the imdbID of ${req.params.imdbID}`
+          )
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 export default mediaRouter;

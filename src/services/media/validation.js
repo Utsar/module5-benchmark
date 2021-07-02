@@ -1,23 +1,22 @@
-import { body } from "express-validator";
 import { checkSchema, validationResult } from "express-validator";
 
 const schema = {
   Title: {
     in: ["body"],
     isString: {
-      errorMessage: "Title Validation failed, type must be string",
+      errorMessage: "Title  must be string",
     },
   },
   Year: {
     in: ["body"],
     isNumeric: {
-      errorMessage: "Year Validation failed, type must be a number",
+      errorMessage: "Year  must be a number",
     },
   },
   Type: {
     in: ["body"],
     isString: {
-      errorMessage: "Type Validation failed, type must be string",
+      errorMessage: "Type  must be string",
     },
   },
 };

@@ -10,7 +10,10 @@ export const badRequestErrorHandler = (err, req, res, next) => {
   if (err && err.status === 400) {
     res
       .status(400)
-      .send({ message: err.message || "not found!", errors: err.errors || [] });
+      .send({
+        message: err.message || "Error not found!",
+        errors: err.errors || [],
+      });
   } else {
     next(err);
   }
@@ -25,5 +28,5 @@ export const forbiddenErrorHandler = (err, req, res, next) => {
 };
 
 export const catchAllErrorHandler = (err, req, res, next) => {
-  res.status(500).send({ message: err.message || "Generic Server Error" });
+  res.status(500).send({ message: err.message || "General Server Error" });
 };
